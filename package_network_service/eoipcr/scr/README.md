@@ -13,18 +13,7 @@ This project's goals are:
 Install
 -------
 
-This code was developed on a 3.2.44 linux kernel and tested on the next 3.2.x releases. Patches and out-of-tree builds are provided for 3.2/3.16/4.19 kernels. It should not be hard to adapt it to different Linux kernels.
-
--   To patch a kernel tree:
-
-````shell
-cd path-to-kernel-source/linux-X.Y.Z
-patch -p1 < path-to-eoip/kernel-patch/kernel-X.Y.Z-eoip-gre-demux.patch
-patch -p1 < path-to-eoip/kernel-patch/kernel-X.Y.Z-eoip-buildconf.patch
-patch -p1 < path-to-eoip/kernel-patch/kernel-X.Y.Z-eoip.patch
-````
-
-afterwards configure the kernel in the usual ways `make (menu/x/...)config` and do not forget to select `IP: EOIP tunnels over IP` located under `Networking options` from `Networking support`
+Afterwards configure the kernel in the usual ways `make (menu/x/...)config` and do not forget to select `IP: EOIP tunnels over IP` located under `Networking options` from `Networking support`
 
 EOIP tunnel depends on `IP: GRE demultiplexer` - if it not selected then EOIP tunnel is not shown at all
 
@@ -40,7 +29,7 @@ make install
 
 For this to work at least the running kernel's headers should be available.
 
-On Debian/Ubuntu systems this build process will place the newly built modules in `/lib/modules/x.x.x.x/misc`. Note that there will be two versions of `gre.ko` (the GRE demux).
+On OpenWrt systems this build process will place the newly built modules in `/lib/modules/x.x.x.x/`. Note that there will be two versions of `gre.ko` (the GRE demux).
 At least on 3.2/3.16/4.19 it is safe to replace the original version with the modified one because it is backwards compatible.
 
 The `eoip.ko` module cannot operate properly without the newly built version of GRE demux (`gre.ko`). If the original `gre.ko` is loaded then it should be removed and the newly built `gre.ko` loaded before loading `eoip.ko`.
@@ -57,34 +46,7 @@ make
 This example may be used as a checklist for an out of tree build:
 
 ````shell
-root@ubuntu-18_04:~/eoip# make
-cc -Wall -Os -c libnetlink.c
-cc -Wall -Os -o eoip eoipcr.c libnetlink.o
-strip eoip
-root@ubuntu-18_04:~/eoip# cd out-of-tree-4.15.x/
-root@ubuntu-18_04:~/eoip/out-of-tree-4.15.x# make
-patching file eoip.c
-using 4.15.0 version of gre_demux.c
-found running kernel version of gre.h
-patching file gre.h
-Hunk #1 succeeded at 24 (offset 15 lines).
-patching file gre_demux.c
-Hunk #3 succeeded at 137 (offset -9 lines).
-Hunk #4 succeeded at 173 (offset -9 lines).
-make[1]: Entering directory '/usr/src/linux-headers-4.15.0-106-generic'
-  CC [M]  /root/eoip/out-of-tree-4.15.x/eoip.o
-  CC [M]  /root/eoip/out-of-tree-4.15.x/gre.o
-  Building modules, stage 2.
-  MODPOST 2 modules
-  CC      /root/eoip/out-of-tree-4.15.x/eoip.mod.o
-  LD [M]  /root/eoip/out-of-tree-4.15.x/eoip.ko
-  CC      /root/eoip/out-of-tree-4.15.x/gre.mod.o
-  LD [M]  /root/eoip/out-of-tree-4.15.x/gre.ko
-make[1]: Leaving directory '/usr/src/linux-headers-4.15.0-106-generic'
-root@ubuntu-18_04:~/eoip/out-of-tree-4.15.x# insmod ./gre.ko
-root@ubuntu-18_04:~/eoip/out-of-tree-4.15.x# insmod ./eoip.ko
-root@ubuntu-18_04:~/eoip/out-of-tree-4.15.x# ../eoip add name eoip0 local 203.0.113.113 remote 198.51.100.100 tunnel-id 8421
-root@ubuntu-18_04:~/eoip/out-of-tree-4.15.x# ip li set eoip0 up
+
 ````
 
 Userland management utility
